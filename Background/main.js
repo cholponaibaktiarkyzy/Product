@@ -4,20 +4,16 @@ const submitBtn = document.getElementById('submit');
 const count = document.getElementById('count');
 const products = document.querySelector('.products')
 
-//храним свои ендпоинты
+
 const endpoints = {
   products: `${baseURL}/products/`,
 }
-//GET запрос (PRODUCTS-ALL)
-// state ->  состояние проекта
-// ctrl+alt+L авто редактор
 const state = {
   products: null
 }
 
 function getAllProducts() {
   products.innerHTML = ''
-  alert('get')
   fetch(endpoints.products)
       .then((req) => req.json())
       .then((data) => {
@@ -36,14 +32,16 @@ function showProduct({id, price, description, title, stock_price}, ind) {
        <p class="description">${description}</p>
        <p class="price">${price}</p>
        <p class="price">${stock_price}</p>
-       <button class="btnDel" onclick="deleteProduct(${ind})" id=${id}>Delete</button>
+       <button class="btnDel" onclick="deleteProduct(${ind})">Delete</button>  
+       <button class="changebtn" onclick="onEdit(${ind})">Edit</button>
+       
     </div>`
 }
 
 getAllProducts();
 
 function addProduct() {
-  //POST
+
   const product = {
     title: document.getElementById('name').value,
     description: document.getElementById('description').value,
@@ -60,12 +58,6 @@ function addProduct() {
     },
     body: JSON.stringify(product)
   }).then((res) => {
-    if (res.status === 404) {
-      alert(res.statusText)
-    }
-    if (res.ok) {
-      alert('Success')
-    }
     console.log(res.status, res.statusText);
   })
 }
@@ -74,7 +66,6 @@ submitBtn.addEventListener('click', addProduct)
 
 function deleteProduct(index) {
   let delProduct = state.products[index]
-  // console.log(delP.id);
   return fetch(`${endpoints.products}${delProduct.id}`, {
     method: 'DELETE',
     headers: {
@@ -91,6 +82,46 @@ function deleteProduct(index) {
   );
 }
 
-// delete.addEventListener('click',removePostRequest)
-// const deletePost = document.getElementById('delete')
+function getValueEl(elID) {
+  return document.getElementById(`${elID}`).value;
+}
+
+function onEdit(index) {
+  const updatePr = state.products[index]
+
+  document.getElementById('category_id').value = updatePr.id;
+  document.getElementById('name').value = updatePr.title;
+  document.getElementById('description').value = updatePr.description;
+  document.getElementById('price').value = updatePr.price;
+  document.getElementById('stock_price').value = updatePr.stock_price;
+
+}
+
+function updateSave() {
+  const product = {
+    category_id: +document.getElementById('category_id').value,
+    title: document.getElementById('name').value,
+    description: document.getElementById('description').value,
+    price: document.getElementById('price').value,
+    stock_price: getValueEl('stock_price')
+
+  }
+
+  updateProduct(product);
+}
+
+function updateProduct(product) {
+  fetch(`${endpoints.products}${product.category_id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  }).then((res) => {
+    return res.json()
+  }).then(data => {
+        console.log(data)
+      }
+  );
+}
 

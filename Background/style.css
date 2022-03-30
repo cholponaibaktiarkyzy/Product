@@ -76,6 +76,7 @@ button{
     background-color: indianred;
     border-radius: 3px;
     border: 3px;
+    top: 20px;
 }
 #submit{
     background-color: yellowgreen;
